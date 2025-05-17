@@ -1,9 +1,9 @@
 # Ignorar a pasta de build e arquivos temporários do CMake
-/build/
-/CMakeCache.txt
-/CMakeFiles/
-/Makefile
-/cmake_install.cmake
+*/build/
+*/CMakeCache.txt
+*/CMakeFiles/
+*/Makefile
+*/cmake_install.cmake
 
 # Ignorar arquivos de saída do compilador (objetos e executáveis)
 *.o
