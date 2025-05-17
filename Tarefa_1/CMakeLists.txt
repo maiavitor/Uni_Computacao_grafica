@@ -64,7 +64,7 @@ else()
 endif()
 
 # Caminho esperado para a GLAD
-set(GLAD_C_FILE "${CMAKE_SOURCE_DIR}/common/glad.c")
+set(GLAD_C_FILE "${CMAKE_SOURCE_DIR}/Common/glad.c")
 
 # Verifica se os arquivos da GLAD estão no lugar
 if (NOT EXISTS ${GLAD_C_FILE})
