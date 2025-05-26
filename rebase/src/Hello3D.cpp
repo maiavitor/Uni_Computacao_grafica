@@ -34,6 +34,12 @@ int setupGeometry();
 // Dimensões da janela (pode ser alterado em tempo de execução)
 const GLuint WIDTH = 1000, HEIGHT = 1000;
 
+struct object  {
+	GLuint buffer;
+	glm::mat4 model;	
+};
+
+
 GLuint ibo;
 // Código fonte do Vertex Shader (em GLSL): ainda hardcoded
 const GLchar* vertexShaderSource = "#version 450\n"
@@ -57,7 +63,7 @@ const GLchar* fragmentShaderSource = "#version 450\n"
 "color = finalColor;\n"
 "}\n\0";
 
-bool rotateX=false, rotateY=false, rotateZ=false;
+GLfloat  rotateX=0.0, rotateY=0.0, rotateZ=0.0;
 
 // Função MAIN
 int main()
@@ -108,20 +114,20 @@ int main()
 	GLuint shaderID = setupShader();
 
 	// Gerando um buffer simples, com a geometria de um triângulo
-	GLuint VAO = setupGeometry();
-
+	GLuint VAO1 = setupGeometry();
+	GLuint VAO2 = setupGeometry();
 
 	glUseProgram(shaderID);
 
 	glm::mat4 model = glm::mat4(1); //matriz identidade;
 	GLint modelLoc = glGetUniformLocation(shaderID, "model");
 	//
-	model = glm::rotate(model, /*(GLfloat)glfwGetTime()*/glm::radians(90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-	glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+	// model = glm::rotate(model, /*(GLfloat)glfwGetTime()*/glm::radians(90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+	//glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
 
 	glEnable(GL_DEPTH_TEST);
 
-
+	
 	// Loop da aplicação - "game loop"
 	while (!glfwWindowShouldClose(window))
 	{
@@ -131,48 +137,41 @@ int main()
 		// Limpa o buffer de cor
 		glClearColor(1.0f, 1.0f, 1.0f, 1.0f); //cor de fundo
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		
 
-		glLineWidth(10);
-		glPointSize(20);
-
-		float angle = (GLfloat)glfwGetTime();
-
-		model = glm::mat4(1); 
-		if (rotateX)
-		{
-			model = glm::rotate(model, angle, glm::vec3(1.0f, 0.0f, 0.0f));
+		for (int c = 0; c < 2; c++ ){ 
 			
-		}
-		else if (rotateY)
-		{
-			model = glm::rotate(model, angle, glm::vec3(0.0f, 1.0f, 0.0f));
+					
+			model = glm::mat4(1);
+			
 
-		}
-		else if (rotateZ)
-		{
-			model = glm::rotate(model, angle, glm::vec3(0.0f, 0.0f, 1.0f));
-
-		}
-
-		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-		// Chamada de desenho - drawcall
-		// Poligono Preenchido - GL_TRIANGLES
-		
-		glBindVertexArray(VAO);
-		
-		glDrawElements(GL_TRIANGLES, 24, GL_UNSIGNED_INT, 0);
-
-		// Chamada de desenho - drawcall
-		// CONTORNO - GL_LINE_LOOP
-		
-		//glDrawArrays(GL_POINTS, 0, 18);
-		glBindVertexArray(0);
+			if (c == 0){
+				model = glm::translate(model, glm::vec3(-1.0f,0.0f,0.0f)) * glm::rotate(model, glm::radians(rotateX),glm::vec3(1.0f,0.0f,0.0f))*glm::rotate(model, glm::radians(rotateY),glm::vec3(0.0f,1.0f,0.0f))*glm::rotate(model, glm::radians(rotateZ),glm::vec3(0.0f,0.0f,1.0f));
+				glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+				glBindVertexArray(VAO1);	
+				
+			}
+			else {
+				model = glm::translate(model, glm::vec3(1.0f,0.0f,0.0f))*glm::rotate(model, glm::radians(rotateX),glm::vec3(1.0f,0.0f,0.0f))*glm::rotate(model, glm::radians(rotateY),glm::vec3(0.0f,1.0f,0.0f))*glm::rotate(model, glm::radians(rotateZ),glm::vec3(0.0f,0.0f,1.0f));
+				glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+				glBindVertexArray(VAO2);	
+			}
+			
+			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);		
+			glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
+			
+			// Chamada de desenho - drawcall
+			// CONTORNO - GL_LINE_LOOP
+			
+			//glDrawArrays(GL_POINTS, 0, 18);
+			glBindVertexArray(0);}
 
 		// Troca os buffers da tela
 		glfwSwapBuffers(window);
 	}
 	// Pede pra OpenGL desalocar os buffers
-	glDeleteVertexArrays(1, &VAO);
+	glDeleteVertexArrays(1, &VAO1);
+	glDeleteVertexArrays(1, &VAO2);
 	// Finaliza a execução da GLFW, limpando os recursos alocados por ela
 	glfwTerminate();
 	return 0;
@@ -186,25 +185,23 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 	if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
 		glfwSetWindowShouldClose(window, GL_TRUE);
 
-	if (key == GLFW_KEY_X && action == GLFW_PRESS)
+	if (key == GLFW_KEY_X && (action == GLFW_PRESS || GLFW_REPEAT))
 	{
-		rotateX = true;
-		rotateY = false;
-		rotateZ = false;
+		rotateX += 1.0f;
+		
 	}
 
-	if (key == GLFW_KEY_Y && action == GLFW_PRESS)
+	if (key == GLFW_KEY_Y && (action == GLFW_PRESS || GLFW_REPEAT))
 	{
-		rotateX = false;
-		rotateY = true;
-		rotateZ = false;
+		
+		rotateY += 1.0f;
+		
 	}
 
-	if (key == GLFW_KEY_Z && action == GLFW_PRESS)
+	if (key == GLFW_KEY_Z && (action == GLFW_PRESS || GLFW_REPEAT))
 	{
-		rotateX = false;
-		rotateY = false;
-		rotateZ = true;
+		rotateZ += 1.0f;
+		
 	}
 
 
@@ -275,15 +272,15 @@ int setupGeometry()
 
 		//Base da pirâmide: 2 triângulos
 		//x    y    z    r    g    b
-		-0.5, -0.5, -0.5, 1.0, 1.0, 0.0,   // 2 inferior - +z 
-		 0.5,  0.5, -0.5, 0.0, 1.0, 1.0,   // 1 superior - +z
-		 0.5, -0.5, -0.5, 1.0, 0.0, 1.0,   // 2 superior - +z
-		-0.5,  0.5, -0.5, 1.0, 1.0, 0.0,   // 1 inferior - +z
+		-0.5, -0.5, 0.5, 1.0, 0.0, 0.0,   // 2 inferior - +z 
+		 0.5,  0.5, 0.5, 0.0, 1.0, 0.0,   // 1 superior - +z
+		 0.5, -0.5, 0.5, 1.0, 0.0, 1.0,   // 2 superior - +z
+		-0.5,  0.5, 0.5, 1.0, 1.0, 0.0,   // 1 inferior - +z
 
-		-0.5, -0.5,  0.0, 0.5, 0.5, 0.0,   // 2 inferior - z
-		 0.5,  0.5,  0.0, 0.0, 0.5, 0.5,   // 1 superior - z
-		 0.5, -0.5,  0.0, 0.5, 0.0, 0.5,   // 2 superior - z
-		-0.5,  0.5,  0.0, 0.5, 0.5, 0.0,   // 1 inferior - z
+		-0.5, -0.5,  -0.5, 1.0, 0.0, 0.2,   // 2 inferior - z
+		 0.5,  0.5,  -0.5, 0.0, 1.0, 0.2,   // 1 superior - z
+		 0.5, -0.5,  -0.5, 0.2, 0.0, 1.0,   // 2 superior - z
+		-0.5,  0.5,  -0.5, 1.0, 0.5, 1.0,   // 1 inferior - z
 
 
 	};
@@ -305,6 +302,33 @@ int setupGeometry()
 	// Vincula (bind) o VAO primeiro, e em seguida  conecta e seta o(s) buffer(s) de vértices
 	// e os ponteiros para os atributos 
 	glBindVertexArray(VAO);
+
+	unsigned int indices[] = {
+								0, 1, 2, 
+								3, 1, 0,
+
+								2, 6, 4,
+								0, 2, 4,
+
+								7, 6, 5,
+								4, 6, 7,
+
+								1, 5, 7,
+								3, 1, 7,
+
+								1, 5, 2,
+								2, 5, 6,
+
+								3, 7, 0,
+								0, 7, 4
+									
+		
+	};
+
+	glGenBuffers(1, &ibo);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+
 	
 	//Para cada atributo do vertice, criamos um "AttribPointer" (ponteiro para o atributo), indicando: 
 	// Localização no shader * (a localização dos atributos devem ser correspondentes no layout especificado no vertex shader)
@@ -330,24 +354,7 @@ int setupGeometry()
 	// Desvincula o VAO (é uma boa prática desvincular qualquer buffer ou array para evitar bugs medonhos)
 	glBindVertexArray(0);
 
-	unsigned int indices[] = {
-								1, 2, 0,
-								3, 1, 2,
-
-								2, 6, 4,
-								0, 2, 4,
-
-								7, 6, 5,
-								4, 6, 7,
-
-								1, 5, 7,
-								3, 1, 7	
-		
-	};
-
-	glGenBuffers(1, &ibo);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW)
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 	
 	return VAO;
 }
