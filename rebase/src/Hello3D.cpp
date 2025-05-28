@@ -22,7 +22,7 @@ using namespace std;
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
-
+#include "model.h"
 
 // Protótipo da função de callback de teclado
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mode);
@@ -33,11 +33,6 @@ int setupGeometry();
 
 // Dimensões da janela (pode ser alterado em tempo de execução)
 const GLuint WIDTH = 1000, HEIGHT = 1000;
-
-struct object  {
-	GLuint buffer;
-	glm::mat4 model;	
-};
 
 
 GLuint ibo;
@@ -112,14 +107,19 @@ int main()
 
 	// Compilando e buildando o programa de shader
 	GLuint shaderID = setupShader();
+	 
 
-	// Gerando um buffer simples, com a geometria de um triângulo
 	GLuint VAO1 = setupGeometry();
-	GLuint VAO2 = setupGeometry();
+	//GLuint VAO2 = setupGeometry();
 
+	
+	
 	glUseProgram(shaderID);
 
 	glm::mat4 model = glm::mat4(1); //matriz identidade;
+
+	modelo cubo0(VAO1, ibo, model);
+	
 	GLint modelLoc = glGetUniformLocation(shaderID, "model");
 	//
 	// model = glm::rotate(model, /*(GLfloat)glfwGetTime()*/glm::radians(90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
@@ -134,44 +134,24 @@ int main()
 		// Checa se houveram eventos de input (key pressed, mouse moved etc.) e chama as funções de callback correspondentes
 		glfwPollEvents();
 
+		cubo0.setRotation(rotateX, 'x');
+
+		rotateX = 0.0f;
+
 		// Limpa o buffer de cor
 		glClearColor(1.0f, 1.0f, 1.0f, 1.0f); //cor de fundo
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+		glBindVertexArray(0);
 		
-
-		for (int c = 0; c < 2; c++ ){ 
-			
-					
-			model = glm::mat4(1);
-			
-
-			if (c == 0){
-				model = glm::translate(model, glm::vec3(-1.0f,0.0f,0.0f)) * glm::rotate(model, glm::radians(rotateX),glm::vec3(1.0f,0.0f,0.0f))*glm::rotate(model, glm::radians(rotateY),glm::vec3(0.0f,1.0f,0.0f))*glm::rotate(model, glm::radians(rotateZ),glm::vec3(0.0f,0.0f,1.0f));
-				glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-				glBindVertexArray(VAO1);	
-				
-			}
-			else {
-				model = glm::translate(model, glm::vec3(1.0f,0.0f,0.0f))*glm::rotate(model, glm::radians(rotateX),glm::vec3(1.0f,0.0f,0.0f))*glm::rotate(model, glm::radians(rotateY),glm::vec3(0.0f,1.0f,0.0f))*glm::rotate(model, glm::radians(rotateZ),glm::vec3(0.0f,0.0f,1.0f));
-				glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-				glBindVertexArray(VAO2);	
-			}
-			
-			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);		
-			glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
-			
-			// Chamada de desenho - drawcall
-			// CONTORNO - GL_LINE_LOOP
-			
-			//glDrawArrays(GL_POINTS, 0, 18);
-			glBindVertexArray(0);}
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(cubo0.getModelMatrix()));
+		
+		cubo0.draw();
 
 		// Troca os buffers da tela
 		glfwSwapBuffers(window);
 	}
 	// Pede pra OpenGL desalocar os buffers
-	glDeleteVertexArrays(1, &VAO1);
-	glDeleteVertexArrays(1, &VAO2);
 	// Finaliza a execução da GLFW, limpando os recursos alocados por ela
 	glfwTerminate();
 	return 0;

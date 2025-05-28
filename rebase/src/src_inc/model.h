@@ -1,5 +1,5 @@
-#ifndef MODELO_H
-#define MODELO_H
+#pragma once
+
 
 
 class modelo {
@@ -12,15 +12,37 @@ public:
 		VAO(vao), IBO(ibo), model(mod){} 
 	~modelo();
 
-		void setTransf(const glm:mat4& transform);
+		void setTransf(const glm::mat4& transform) noexcept {
+		        model_ = transform;
+		        }
 
 		void draw() const {
-				glBindVertexArray(VAO);
-				glBindBuffer(GL_ELEMNT_ARRAY_BUFFER, IBO);
+				glBindVertexArray(VAO_);
+				glBindBuffer(GL_ELEMNT_ARRAY_BUFFER, IBO_);
 				glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
+				glBindVertexArray(0);
 				
 		}
 
-		
+		void setRotation(const GLfloat angle, char axis){
+			switch (axis){
+				const float radians = glm::radians(angleDegrees);
+		        switch (axis) {
+		            case 'x':			        
+		                model_ = glm::rotate(model_, radians, glm::vec3(1.0f, 0.0f, 0.0f));
+		                break;
+		            case 'y':
+		                model_ = glm::rotate(model_, radians, glm::vec3(0.0f, 1.0f, 0.0f));
+		                break;
+		            case 'z':
+		                model_ = glm::rotate(model_, radians, glm::vec3(0.0f, 0.0f, 1.0f));
+		                break;           
+		        }
+			}	
+		}
+		 
+		const glm::mat4& getModelMatrix() const noexcept {
+		        return modelMatrix_;
+		    }
 };
-#endif
+
