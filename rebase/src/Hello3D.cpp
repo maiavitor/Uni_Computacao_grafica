@@ -9,6 +9,7 @@
 #include <iostream>
 #include <string>
 #include <assert.h>
+#include <cstdio>
 
 using namespace std;
 
@@ -58,26 +59,15 @@ const GLchar* fragmentShaderSource = "#version 450\n"
 "color = finalColor;\n"
 "}\n\0";
 
-GLfloat  rotateX=0.0, rotateY=0.0, rotateZ=0.0;
+GLfloat  rotateX=0.0, rotateY=0.0, rotateZ=0.0, dir_a=0.0, dir_d=0.0 ,dir_w=0.0, dir_s=0.0;
+GLfloat dir_i=0.0, dir_k=0.0, escala=1.0f;
+
+int imodelo=0;
 
 // Função MAIN
 int main()
 {
-	// Inicialização da GLFW
 	glfwInit();
-
-	//Muita atenção aqui: alguns ambientes não aceitam essas configurações
-	//Você deve adaptar para a versão do OpenGL suportada por sua placa
-	//Sugestão: comente essas linhas de código para desobrir a versão e
-	//depois atualize (por exemplo: 4.5 com 4 e 5)
-	//glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
-	//glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
-	//glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-
-	//Essencial para computadores da Apple
-//#ifdef __APPLE__
-//	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
-//#endif
 
 	// Criação da janela GLFW
 	GLFWwindow* window = glfwCreateWindow(WIDTH, HEIGHT, "Ola 3D -- Vitor Maia!", nullptr, nullptr);
@@ -93,12 +83,6 @@ int main()
 
 	}
 
-	// Obtendo as informações de versão
-	const GLubyte* renderer = glGetString(GL_RENDERER); /* get renderer string */
-	const GLubyte* version = glGetString(GL_VERSION); /* version as a string */
-	cout << "Renderer: " << renderer << endl;
-	cout << "OpenGL version supported " << version << endl;
-
 	// Definindo as dimensões da viewport com as mesmas dimensões da janela da aplicação
 	int width, height;
 	glfwGetFramebufferSize(window, &width, &height);
@@ -110,18 +94,23 @@ int main()
 	 
 
 	GLuint VAO1 = setupGeometry();
-	//GLuint VAO2 = setupGeometry();
+	GLuint VAO2 = setupGeometry();
 
 	
+	glm::mat4 mod1 = glm::translate(glm::mat4(1),glm::vec3(0.5f,0.0f,0.0f));
+	glm::mat4 mod2 = glm::translate(glm::mat4(1),glm::vec3(-0.5f,0.0f,0.0f));
 	
 	glUseProgram(shaderID);
-
-	glm::mat4 model = glm::mat4(1); //matriz identidade;
-
-	modelo cubo0(VAO1, ibo, model);
 	
+	modelo cubo0(VAO1, ibo, mod1);
+	
+	modelo cubo1(VAO2, ibo, mod2);
+
+	modelo modelos[2] = {cubo0,cubo1};
+
+
 	GLint modelLoc = glGetUniformLocation(shaderID, "model");
-	//
+	
 	// model = glm::rotate(model, /*(GLfloat)glfwGetTime()*/glm::radians(90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
 	//glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
 
@@ -134,21 +123,37 @@ int main()
 		// Checa se houveram eventos de input (key pressed, mouse moved etc.) e chama as funções de callback correspondentes
 		glfwPollEvents();
 
-		cubo0.setRotation(rotateX, 'x');
-
-		rotateX = 0.0f;
-
-		// Limpa o buffer de cor
+		printf("%d\n",imodelo);
+		
 		glClearColor(1.0f, 1.0f, 1.0f, 1.0f); //cor de fundo
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		glBindVertexArray(0);
 		
-		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(cubo0.getModelMatrix()));
-		
-		cubo0.draw();
+		for (int i = 0; i < 2 ;i++){
 
-		// Troca os buffers da tela
+			if (imodelo == 1) {
+				modelos[1].setRotation(rotateX, 'x');
+				modelos[1].setRotation(rotateY, 'y');
+				modelos[1].setRotation(rotateZ, 'z');
+				modelos[1].setTransf(dir_a,dir_d,dir_s,dir_w,dir_i,dir_k);
+				modelos[1].setScale(escala);
+			}
+			else {
+				modelos[0].setRotation(rotateX, 'x');
+				modelos[0].setRotation(rotateY, 'y');
+				modelos[0].setRotation(rotateZ, 'z');
+				modelos[0].setTransf(dir_a,dir_d,dir_s,dir_w,dir_i,dir_k);
+				modelos[0].setScale(escala);
+			}
+
+			dir_a=dir_d=dir_w=dir_s=dir_i=dir_k = 0.0f;
+			rotateX=rotateY=rotateZ = 0.0f;
+			escala = 1.0f;
+			modelos[i].draw(modelLoc);					
+			
+		}
+
 		glfwSwapBuffers(window);
 	}
 	// Pede pra OpenGL desalocar os buffers
@@ -183,7 +188,57 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 		rotateZ += 1.0f;
 		
 	}
+	
+	if (key == GLFW_KEY_A && (action == GLFW_PRESS || GLFW_REPEAT))
+	{
+		
+		dir_a -= 0.02f;
+	}
 
+	if (key == GLFW_KEY_D && (action == GLFW_PRESS || GLFW_REPEAT))
+	{
+		dir_d += 0.02f;
+	}
+
+	
+	if (key == GLFW_KEY_W && (action == GLFW_PRESS || GLFW_REPEAT))
+	{
+		dir_w += 0.02f;		
+	}
+	
+	if (key == GLFW_KEY_S && (action == GLFW_PRESS || GLFW_REPEAT))
+	{
+		dir_s -= 0.02f;
+		
+	}
+
+	if (key == GLFW_KEY_I && (action == GLFW_PRESS || GLFW_REPEAT))
+	{
+		dir_i += 0.02f;		
+	}
+	
+	if (key == GLFW_KEY_K && (action == GLFW_PRESS || GLFW_REPEAT))
+	{
+		dir_k -= 0.02f;
+		
+	}
+	
+	if (key == GLFW_KEY_LEFT_BRACKET && (action == GLFW_PRESS || GLFW_REPEAT))
+	{
+		escala += 0.02f;		
+	}
+	
+	if (key == GLFW_KEY_RIGHT_BRACKET && (action == GLFW_PRESS || GLFW_REPEAT))
+	{
+		escala -= 0.02f;
+		
+	}
+	
+	if (key == GLFW_KEY_F && action == GLFW_RELEASE)
+	{
+		imodelo =  (1+imodelo) % 2;
+		
+	}
 
 
 }

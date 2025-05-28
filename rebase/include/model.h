@@ -11,14 +11,15 @@ public:
 	modelo(GLuint vao, GLuint ibo, glm::mat4 mod):
 		VAO(vao), IBO(ibo), model(mod){} 
 
-		void setTransf(const glm::mat4& transform) noexcept {
-		        model = transform;
+		void setTransf(const GLfloat a, const GLfloat d, const GLfloat s,const GLfloat w, const GLfloat i,const GLfloat k) {
+		        model = glm::translate(model, glm::vec3(a, i, w));
+		        model = glm::translate(model, glm::vec3(d, k, s));
 		        }
 
-		void draw() const {
+		void draw(const GLint modelloc) const {
 				
 				glBindVertexArray(VAO);
-				
+				glUniformMatrix4fv(modelloc, 1, GL_FALSE, glm::value_ptr(model));
 				glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, IBO);
 				glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
 				glBindVertexArray(0);
@@ -39,6 +40,10 @@ public:
 	                break;           
 	        }
 		}	
+
+		void setScale(const GLfloat size){
+			model = glm::scale(model, glm::vec3(size,size,size));
+		}
 		 
 		const glm::mat4& getModelMatrix() const noexcept {
 		        return model;
