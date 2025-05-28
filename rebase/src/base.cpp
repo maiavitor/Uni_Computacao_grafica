@@ -92,18 +92,18 @@ int main()
 	// Compilando e buildando o programa de shader
 	GLuint shaderID = setupShader();
 	 
-
+	//inicialização do buffer dos obejetos
 	GLuint VAO1 = setupGeometry();
 	GLuint VAO2 = setupGeometry();
 
-	
+	//inicializando e aplicando as transformações
 	glm::mat4 mod1 = glm::translate(glm::mat4(1),glm::vec3(0.5f,0.0f,0.0f));
 	glm::mat4 mod2 = glm::translate(glm::mat4(1),glm::vec3(-0.5f,0.0f,0.0f));
 	
 	glUseProgram(shaderID);
-	
+
+	//inicializando os objetos com buffer, indices, e matriz
 	modelo cubo0(VAO1, ibo, mod1);
-	
 	modelo cubo1(VAO2, ibo, mod2);
 
 	modelo modelos[2] = {cubo0,cubo1};
@@ -123,7 +123,6 @@ int main()
 		// Checa se houveram eventos de input (key pressed, mouse moved etc.) e chama as funções de callback correspondentes
 		glfwPollEvents();
 
-		printf("%d\n",imodelo);
 		
 		glClearColor(1.0f, 1.0f, 1.0f, 1.0f); //cor de fundo
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -131,7 +130,7 @@ int main()
 		glBindVertexArray(0);
 		
 		for (int i = 0; i < 2 ;i++){
-
+			// gerenciamento dos movimentos dos cubos
 			if (imodelo == 1) {
 				modelos[1].setRotation(rotateX, 'x');
 				modelos[1].setRotation(rotateY, 'y');
@@ -146,10 +145,11 @@ int main()
 				modelos[0].setTransf(dir_a,dir_d,dir_s,dir_w,dir_i,dir_k);
 				modelos[0].setScale(escala);
 			}
-
+			
 			dir_a=dir_d=dir_w=dir_s=dir_i=dir_k = 0.0f;
 			rotateX=rotateY=rotateZ = 0.0f;
 			escala = 1.0f;
+
 			modelos[i].draw(modelLoc);					
 			
 		}
@@ -172,21 +172,18 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 
 	if (key == GLFW_KEY_X && (action == GLFW_PRESS || GLFW_REPEAT))
 	{
-		rotateX += 1.0f;
-		
+		rotateX += 1.0f;		
 	}
 
 	if (key == GLFW_KEY_Y && (action == GLFW_PRESS || GLFW_REPEAT))
 	{
 		
-		rotateY += 1.0f;
-		
+		rotateY += 1.0f;		
 	}
 
 	if (key == GLFW_KEY_Z && (action == GLFW_PRESS || GLFW_REPEAT))
 	{
 		rotateZ += 1.0f;
-		
 	}
 	
 	if (key == GLFW_KEY_A && (action == GLFW_PRESS || GLFW_REPEAT))
@@ -199,7 +196,6 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 	{
 		dir_d += 0.02f;
 	}
-
 	
 	if (key == GLFW_KEY_W && (action == GLFW_PRESS || GLFW_REPEAT))
 	{
@@ -208,8 +204,7 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 	
 	if (key == GLFW_KEY_S && (action == GLFW_PRESS || GLFW_REPEAT))
 	{
-		dir_s -= 0.02f;
-		
+		dir_s -= 0.02f;	
 	}
 
 	if (key == GLFW_KEY_I && (action == GLFW_PRESS || GLFW_REPEAT))
@@ -220,7 +215,6 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 	if (key == GLFW_KEY_K && (action == GLFW_PRESS || GLFW_REPEAT))
 	{
 		dir_k -= 0.02f;
-		
 	}
 	
 	if (key == GLFW_KEY_LEFT_BRACKET && (action == GLFW_PRESS || GLFW_REPEAT))
@@ -230,16 +224,13 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 	
 	if (key == GLFW_KEY_RIGHT_BRACKET && (action == GLFW_PRESS || GLFW_REPEAT))
 	{
-		escala -= 0.02f;
-		
+		escala -= 0.02f;		
 	}
 	
 	if (key == GLFW_KEY_F && action == GLFW_RELEASE)
 	{
-		imodelo =  (1+imodelo) % 2;
-		
+		imodelo =  (1+imodelo) % 2;		
 	}
-
 
 }
 
