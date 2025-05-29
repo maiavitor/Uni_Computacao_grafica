@@ -22,6 +22,6 @@ Renderização e controle de transformações de cubos 3D, por meio do teclado -
 
 ## Demo
 
-📽️ [video](./video_tarefa.mp4)
+📽️ [video](./tarefa2_video.mkv)
 
 ---
