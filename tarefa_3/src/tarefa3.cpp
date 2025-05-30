@@ -116,10 +116,22 @@ int main()
 		glfwPollEvents();
 
 		
-		glClearColor(1.0f, 1.0f, 1.0f, 1.0f); //cor de fundo
+		glClearColor(0.0f, 0.0f, 0.0f, 0.0f); //cor de fundo
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		glBindVertexArray(0);
+
+		su.setScale(escala);
+
+		su.setRotation(rotateX, 'x');
+		su.setRotation(rotateY, 'y');
+		su.setRotation(rotateZ, 'z');
+
+		su.setTransf(dir_a,dir_d,dir_s,dir_w,dir_i,dir_k);
+
+		dir_a=dir_d=dir_s=dir_w=dir_i=dir_k = 0;
+		rotateZ=rotateX=rotateY = 0;
+		escala = 1;
 		
 		su.draw(modelLoc, textloc);							
 
