@@ -1,0 +1,1 @@
+/usr/lib64/ccache/c++ -Wl,--dependency-file=CMakeFiles/base.dir/link.d CMakeFiles/base.dir/src/base.cpp.o CMakeFiles/base.dir/Common/glad.c.o -o base  _deps/glfw-build/src/libglfw3.a /usr/lib64/libGL.so /usr/lib64/librt.a -lm -ldl
