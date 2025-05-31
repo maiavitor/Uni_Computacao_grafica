@@ -41,20 +41,61 @@ const GLuint WIDTH = 1000, HEIGHT = 1000;
 const GLchar* vertexShaderSource = R"(
 #version 400
 layout (location = 0) in vec3 position;
-layout (location = 1) in vec3 texc;
+layout (location = 1) in vec3 normal;
+
+uniform mat4 projection;
 uniform mat4 model;
+
+out vec3 vNormal;
+out vec4 fragPos; 
+out vec4 vColor;
 void main()
 {
-   	gl_Position =  model * vec4(position.x, position.y, position.z, 1.0);
+   	gl_Position = projection * model * vec4(position.x, position.y, position.z, 1.0);
+	fragPos = model * vec4(position.x, position.y, position.z, 1.0);
+	vNormal = normal;
+	vColor = vec4(1.0,0.0,0.0,1.0);
 })";
 
 //Códifo fonte do Fragment Shader (em GLSL): ainda hardcoded
 const GLchar* fragmentShaderSource = R"(
 #version 400
+uniform sampler2D texBuff;
+uniform vec3 lightPos;
+uniform vec3 camPos;
+uniform float ka;
+uniform float kd;
+uniform float ks;
+uniform float q;
 out vec4 color;
+in vec4 fragPos;
+in vec3 vNormal;
+in vec4 vColor;
 void main()
 {
-	color = vec4(1.0,0.0,0.0,1.0);
+
+	vec3 lightColor = vec3(1.0,1.0,1.0);
+	vec4 objectColor = vColor;
+
+	//Coeficiente de luz ambiente
+	vec3 ambient = ka * lightColor;
+
+	//Coeficiente de reflexão difusa
+	vec3 N = normalize(vNormal);
+	vec3 L = normalize(lightPos - vec3(fragPos));
+	float diff = max(dot(N, L),0.0);
+	vec3 diffuse = kd * diff * lightColor;
+
+	//Coeficiente de reflexão especular
+	vec3 R = normalize(reflect(-L,N));
+	vec3 V = normalize(camPos - vec3(fragPos));
+	float spec = max(dot(R,V),0.0);
+	spec = pow(spec,q);
+	vec3 specular = ks * spec * lightColor; 
+
+	vec3 result = (ambient + diffuse) * vec3(objectColor) + specular;
+	color = vec4(result,1.0);
+
 })";
 
 GLfloat  rotateX=0.0, rotateY=0.0, rotateZ=0.0, dir_a=0.0, dir_d=0.0 ,dir_w=0.0, dir_s=0.0;
@@ -94,7 +135,18 @@ int main()
 	//inicializando os objetos com buffer, indices, e matriz
 	modelo su = modelo();
 
+	float ka = 0.1, kd =0.5, ks = 0.5, q = 10.0;
+	glm::vec3 lightPos = glm::vec3(0.6, 1.2, -0.5);
+	glm::vec3 camPos = glm::vec3(0.0,0.0,-3.0);
+
 	GLint modelLoc = glGetUniformLocation(shaderID, "model");
+
+	glUniform1f(glGetUniformLocation(shaderID, "ka"), ka);
+	glUniform1f(glGetUniformLocation(shaderID, "kd"), kd);
+	glUniform1f(glGetUniformLocation(shaderID, "ks"), ks);
+	glUniform1f(glGetUniformLocation(shaderID, "q"), q);
+	glUniform3f(glGetUniformLocation(shaderID, "lightPos"), lightPos.x,lightPos.y,lightPos.z);
+	glUniform3f(glGetUniformLocation(shaderID, "camPos"), camPos.x,camPos.y,camPos.z);
 	
 	glEnable(GL_DEPTH_TEST);
 
