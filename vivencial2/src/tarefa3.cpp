@@ -43,7 +43,6 @@ const GLchar* vertexShaderSource = R"(
 layout (location = 0) in vec3 position;
 layout (location = 1) in vec3 normal;
 
-uniform mat4 projection;
 uniform mat4 model;
 
 out vec3 vNormal;
