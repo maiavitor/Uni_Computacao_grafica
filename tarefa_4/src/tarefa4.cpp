@@ -42,67 +42,79 @@ const GLchar* vertexShaderSource = R"(
 #version 400
 layout (location = 0) in vec3 position;
 layout (location = 1) in vec3 normal;
+layout (location = 2) in vec2 texc;
+
 
 uniform mat4 model;
 
+out vec2 texcoord;
+
 out vec3 vNormal;
 out vec4 fragPos; 
-out vec4 vColor;
+
+
 void main()
 {
    	gl_Position = model * vec4(position.x, position.y, position.z, 1.0);
 	fragPos = model * vec4(position.x, position.y, position.z, 1.0);
 	vNormal = normal;
-	vColor = vec4(1.0,0.0,0.0,1.0);
+	texcoord = vec2(texc.x, 1 - texc.y);
 })";
 
 //Códifo fonte do Fragment Shader (em GLSL): ainda hardcoded
 const GLchar* fragmentShaderSource = R"(
 #version 400
+
 uniform sampler2D texBuff;
-uniform vec3 light[3];
+
+uniform vec3 lightPos;
+uniform vec3 lightColor;
 uniform vec3 camPos;
-uniform float ka;
-uniform float kd;
-uniform float ks;
-uniform float q;
+
+uniform vec3 ka;
+uniform vec3 kd;
+uniform vec3 ks;
+uniform vec3 q;
+
 out vec4 color;
+
 in vec4 fragPos;
 in vec3 vNormal;
 in vec4 vColor;
+in vec2 texcoord
+
 void main()
 {
 
-	vec3 lightColor = vec3(1.0,1.0,1.0);
-	vec4 objectColor = vColor;
+	vec4 objectColor = vec4(texture(texBuff,texcoord).rgb);
 
 	//Coeficiente de luz ambiente
-	vec3 ambient = ka * lightColor;
+	vec3 ambient =  lightColor * ;
 
 	//Coeficiente de reflexão difusa
 	vec3 N = normalize(vNormal);
 
-	vec3 specular = vec3(0.0,0.0,0.0);
+	vec3 specular = ks;
 	vec3 L;
 	float diff, spec;
-	vec3 diffuse = vec3(0.0,0.0,0.0);
+	vec3 diffuse = kd;
 	vec3 R, V;
 
-	for (int x=0; x < 3; x++){
-		L = normalize(light[x] - vec3(fragPos));
-		diff = max(dot(N, L),0.0);
-		diffuse += kd * diff * lightColor;
+	L = normalize(lightPos - vec3(fragPos));
+	diff = max(dot(N, L),0.0);
+	diffuse += diff * lightColor;
 
-		//Coeficiente de reflexão especular
-		R = normalize(reflect(-L,N));
-		V = normalize(camPos - vec3(fragPos));
-		spec = max(dot(R,V),0.0);
-		spec = pow(spec,q);
-		specular += (ks * spec * lightColor); 
-	}
+	//Coeficiente de reflexão especular
+	R = normalize(reflect(-L,N));
+	V = normalize(camPos - vec3(fragPos));
+	spec = max(dot(R,V),0.0);
+	spec = pow(spec,q);
+	specular += (ks * spec * lightColor); 
+
 
 
 	vec3 result = (ambient + diffuse) * vec3(objectColor) + specular;
+	//color = texture(texBuff,texcoord);
 	color = vec4(result,1.0);
 
 })";
@@ -324,101 +336,3 @@ int setupShader()
 
 	return shaderProgram;
 }
-
-// Esta função está bastante harcoded - objetivo é criar os buffers que armazenam a 
-// geometria de um triângulo
-// Apenas atributo coordenada nos vértices
-// 1 VBO com as coordenadas, VAO com apenas 1 ponteiro para atributo
-// A função retorna o identificador do VAO
-int setupGeometry()
-{
-	// Aqui setamos as coordenadas x, y e z do triângulo e as armazenamos de forma
-	// sequencial, já visando mandar para o VBO (Vertex Buffer Objects)
-	// Cada atributo do vértice (coordenada, cores, coordenadas de textura, normal, etc)
-	// Pode ser arazenado em um VBO único ou em VBOs separados
- 
-	GLfloat vertices[] = {
-
-		//Base da pirâmide: 2 triângulos
-		//x    y    z    r    g    b
-		-0.5, -0.5, 0.5, 1.0, 0.0, 0.0,   // 2 inferior - +z 
-		 0.5,  0.5, 0.5, 0.0, 1.0, 0.0,   // 1 superior - +z
-		 0.5, -0.5, 0.5, 1.0, 0.0, 1.0,   // 2 superior - +z
-		-0.5,  0.5, 0.5, 1.0, 1.0, 0.0,   // 1 inferior - +z
-
-		-0.5, -0.5,  -0.5, 1.0, 0.0, 0.2,   // 2 inferior - z
-		 0.5,  0.5,  -0.5, 0.0, 1.0, 0.2,   // 1 superior - z
-		 0.5, -0.5,  -0.5, 0.2, 0.0, 1.0,   // 2 superior - z
-		-0.5,  0.5,  -0.5, 1.0, 0.5, 1.0,   // 1 inferior - z
-
-
-	};
-
-	GLuint VBO, VAO;
-
-	//Geração do identificador do VBO
-	glGenBuffers(1, &VBO);
-
-	//Faz a conexão (vincula) do buffer como um buffer de array
-	glBindBuffer(GL_ARRAY_BUFFER, VBO);
-
-	//Envia os dados do array de floats para o buffer da OpenGl
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-
-	//Geração do identificador do VAO (Vertex Array Object)
-	glGenVertexArrays(1, &VAO);
-
-	// Vincula (bind) o VAO primeiro, e em seguida  conecta e seta o(s) buffer(s) de vértices
-	// e os ponteiros para os atributos 
-	glBindVertexArray(VAO);
-
-	unsigned int indices[] = {
-								0, 1, 2, 
-								3, 1, 0,
-
-								2, 6, 4,
-								0, 2, 4,
-
-								7, 6, 5,
-								4, 6, 7,
-
-								1, 5, 7,
-								3, 1, 7,
-
-								1, 5, 2,
-								2, 5, 6,
-
-								3, 7, 0,
-								0, 7, 4
-									
-		
-	};
-
-	
-	//Para cada atributo do vertice, criamos um "AttribPointer" (ponteiro para o atributo), indicando: 
-	// Localização no shader * (a localização dos atributos devem ser correspondentes no layout especificado no vertex shader)
-	// Numero de valores que o atributo tem (por ex, 3 coordenadas xyz) 
-	// Tipo do dado
-	// Se está normalizado (entre zero e um)
-	// Tamanho em bytes 
-	// Deslocamento a partir do byte zero 
-	
-	//Atributo posição (x, y, z)
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), (GLvoid*)0);
-	glEnableVertexAttribArray(0);
-
-	//Atributo cor (r, g, b)
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), (GLvoid*)(3*sizeof(GLfloat)));
-	glEnableVertexAttribArray(1);
-
-
-	// Observe que isso é permitido, a chamada para glVertexAttribPointer registrou o VBO como o objeto de buffer de vértice 
-	// atualmente vinculado - para que depois possamos desvincular com segurança
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-	// Desvincula o VAO (é uma boa prática desvincular qualquer buffer ou array para evitar bugs medonhos)
-	glBindVertexArray(0);
-	
-	return VAO;
-}
-

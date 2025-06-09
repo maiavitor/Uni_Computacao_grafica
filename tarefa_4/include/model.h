@@ -11,14 +11,20 @@ private:
 	glm::mat4 model;
 	int nVertices;
 	int w,h;
-
+	
 	
 
 public:
 	modelo(){
 			VAO = loadSimpleOBJ("../assets/Modelos3D/Suzanne.obj", nVertices);				
 			model = glm::mat4(1.0f);
-		} 
+		}
+
+	glm::vec3 ka = glm::vec3(1.0f);
+    glm::vec3 kd = glm::vec3(1.0f);
+    glm::vec3 ks = glm::vec3(1.0f);
+    GLfloat specular = 1.0f; 
+
 
 	void setTransf(const GLfloat a, const GLfloat d, const GLfloat s,const GLfloat w, const GLfloat i,const GLfloat k) {
 	        model = glm::translate(model, glm::vec3(a, i, w));
