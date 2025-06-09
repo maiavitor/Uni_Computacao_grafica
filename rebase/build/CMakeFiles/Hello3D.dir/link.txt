@@ -1,1 +1,0 @@
-/usr/lib64/ccache/c++ -Wl,--dependency-file=CMakeFiles/Hello3D.dir/link.d CMakeFiles/Hello3D.dir/src/Hello3D.cpp.o CMakeFiles/Hello3D.dir/Common/glad.c.o -o Hello3D  _deps/glfw-build/src/libglfw3.a /usr/lib64/libGL.so /usr/lib64/librt.a -lm -ldl

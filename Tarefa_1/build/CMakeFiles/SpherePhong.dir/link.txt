@@ -1,1 +1,0 @@
-/usr/bin/c++ -Wl,--dependency-file=CMakeFiles/SpherePhong.dir/link.d CMakeFiles/SpherePhong.dir/src/SpherePhong.cpp.o CMakeFiles/SpherePhong.dir/Common/glad.c.o -o SpherePhong  _deps/glfw-build/src/libglfw3.a /usr/lib/libGL.so /usr/lib/librt.a -lm -ldl

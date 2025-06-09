@@ -1,1 +1,0 @@
-/usr/lib64/ccache/c++ -Wl,--dependency-file=CMakeFiles/TriangleTex.dir/link.d CMakeFiles/TriangleTex.dir/src/TriangleTex.cpp.o CMakeFiles/TriangleTex.dir/Common/glad.c.o -o TriangleTex  _deps/glfw-build/src/libglfw3.a /usr/lib64/libGL.so /usr/lib64/librt.a -lm -ldl
