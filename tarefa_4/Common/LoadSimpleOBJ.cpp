@@ -45,7 +45,7 @@ using namespace std;
 #include <glm/gtc/type_ptr.hpp>
 
 #include "loadObj.h"
-#include "model.h"
+
 
 struct Mesh 
 {
@@ -110,8 +110,8 @@ GLuint loadSimpleOBJ(string filePATH, int &nVertices)
                 vBuffer.push_back(vertices[vi].y);
                 vBuffer.push_back(vertices[vi].z);
                 vBuffer.push_back(normals[ni].x);
-                vBuffer.push_back(normals[ni].y;
-                vBuffer.push_back(normals[ni].z;
+                vBuffer.push_back(normals[ni].y);
+                vBuffer.push_back(normals[ni].z);
                 vBuffer.push_back(texCoords[ti].s);
                 vBuffer.push_back(texCoords[ti].t);
             }
@@ -144,39 +144,6 @@ GLuint loadSimpleOBJ(string filePATH, int &nVertices)
 	nVertices = vBuffer.size() / 8;  // x, y, z, r, g, b (valores atualmente armazenados por vértice)
 
     return VAO;
-}
 
-void loadMTL(string filePath, modelo& mesh ){
-
-	std::ifstream arqEntrada(filePath.c_str());
-	    if (!arqEntrada.is_open()) 
-		{
-	        std::cerr << "Erro ao tentar ler o arquivo " << filePATH << std::endl;
-	        return -1;
-	    }
-	
-	    std::string line;
-	    while (std::getline(arqEntrada, line)) 
-		{
-	        std::istringstream ssline(line);
-	        std::string word;
-	        ssline >> word;
-
-	        switch (word){
-	        	case "Ka":
-	        		ssline >> mesh.ka.r >> mesh.ka.g >> mesh.ka.b;
-	        		break;
-	        	case "Kd":
-	        		ssline >> mesh.kd.r >> mesh.kd.g >> mesh.kd.b;
-	        		break;
-	        	case "Ks":
-	        		ssline >> mesh.ks.r >> mesh.ks.g >> mesh.ks.b;
-	        		break;
-	        	case "Ns":
-	        		ssline >> mesh.specular;
-	        		break;
-	        }
-	
-	
 }
 

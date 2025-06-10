@@ -3,6 +3,15 @@
 
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
+
+#include <iostream>
+#include <fstream>
+#include <sstream>
+#include <string>
+#include <vector>
+
+ 
+using namespace std;
  
 
 class modelo {
@@ -12,19 +21,20 @@ private:
 	int nVertices;
 	int w,h;
 	
-	
-
-public:
-	modelo(){
-			VAO = loadSimpleOBJ("../assets/Modelos3D/Suzanne.obj", nVertices);				
-			model = glm::mat4(1.0f);
-		}
+public:	
 
 	glm::vec3 ka = glm::vec3(1.0f);
     glm::vec3 kd = glm::vec3(1.0f);
     glm::vec3 ks = glm::vec3(1.0f);
     GLfloat specular = 1.0f; 
 
+
+	modelo(){
+			VAO = loadSimpleOBJ("../assets/Modelos3D/Suzanne.obj", nVertices);				
+			model = glm::mat4(1.0f);
+		}
+
+	
 
 	void setTransf(const GLfloat a, const GLfloat d, const GLfloat s,const GLfloat w, const GLfloat i,const GLfloat k) {
 	        model = glm::translate(model, glm::vec3(a, i, w));
@@ -110,6 +120,37 @@ public:
     
     	textID = texID;
     }
+
+	
+	void loadMTL(string filePath){
+	
+		std::ifstream arqEntrada(filePath.c_str());
+		    if (!arqEntrada.is_open()) 
+			{
+		        std::cerr << "Erro ao tentar ler o arquivo " << filePath << std::endl;
+		    }
+		
+	    std::string line;
+	    while (std::getline(arqEntrada, line)) 
+		{
+	        std::istringstream ssline(line);
+	        std::string word;
+	        ssline >> word;
+
+	        if (word == "Ka") 
+        		ssline >> ka.r >> ka.g >> ka.b;
+	        		
+        	else if (word == "Kd")
+        		ssline >> kd.r >> kd.g >> kd.b;
+	        	
+        	else if (word == "Ks")
+        		ssline >> ks.r >> ks.g >> ks.b;
+	     	
+	        else
+        		ssline >> specular;
+		}
+	}
+  
     
 };
 

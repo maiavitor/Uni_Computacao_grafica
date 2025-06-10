@@ -47,11 +47,11 @@ layout (location = 2) in vec2 texc;
 
 uniform mat4 model;
 
-out vec2 texcoord;
 
 out vec3 vNormal;
 out vec4 fragPos; 
 
+out vec2 texcoord;
 
 void main()
 {
@@ -74,22 +74,22 @@ uniform vec3 camPos;
 uniform vec3 ka;
 uniform vec3 kd;
 uniform vec3 ks;
-uniform vec3 q;
+uniform float q;
 
 out vec4 color;
 
 in vec4 fragPos;
 in vec3 vNormal;
 in vec4 vColor;
-in vec2 texcoord
+in vec2 texcoord;
 
 void main()
 {
 
-	vec4 objectColor = vec4(texture(texBuff,texcoord).rgb);
+	vec4 objectColor = vec4(texture(texBuff,texcoord).rgb,1.0);
 
 	//Coeficiente de luz ambiente
-	vec3 ambient =  lightColor * ;
+	vec3 ambient =  lightColor * ka ;
 
 	//Coeficiente de reflexão difusa
 	vec3 N = normalize(vNormal);
@@ -114,7 +114,6 @@ void main()
 
 
 	vec3 result = (ambient + diffuse) * vec3(objectColor) + specular;
-	//color = texture(texBuff,texcoord);
 	color = vec4(result,1.0);
 
 })";
@@ -160,21 +159,28 @@ int main()
 	//inicializando os objetos com buffer, indices, e matriz
 	modelo su = modelo();
 
-	float ka = 0.2, kd =0.5, ks = 0.5, q = 20.0;
-
 	glm::vec3 camPos = glm::vec3(0.0,0.0,-3.0);
 
 	GLint modelLoc = glGetUniformLocation(shaderID, "model");
+	su.loadTexture("../assets/Modelos3D/Suzanne.png");
+	su.loadMTL("../assets/Modelos3D/Suzanne.mtl");
 
-	glUniform1f(glGetUniformLocation(shaderID, "ka"), ka);
-	glUniform1f(glGetUniformLocation(shaderID, "kd"), kd);
-	glUniform1f(glGetUniformLocation(shaderID, "ks"), ks);
-	glUniform1f(glGetUniformLocation(shaderID, "q"), q);
-	for (int x = 0; x < 3; x++)
-		glUniform3f(glGetUniformLocation(shaderID, ("light[" + std::to_string(x) + "]").c_str()), light[x].x,light[x].y,light[x].z);
+
+	std::cout << su.ks.x;
+
+
+	glUniform3f(glGetUniformLocation(shaderID, "lightColor"), su.ka.x,su.ka.y,su.ka.z);
+	glUniform3f(glGetUniformLocation(shaderID, "ka"), su.ka.x,su.ka.y,su.ka.z);
+	glUniform3f(glGetUniformLocation(shaderID, "kd"), su.kd.x,su.kd.y,su.kd.z);
+	glUniform3f(glGetUniformLocation(shaderID, "ks"), su.ks.x,su.ks.y,su.ks.z);
+	glUniform1f(glGetUniformLocation(shaderID, "q"), su.specular);
+	/*for (int x = 0; x < 3; x++)
+		glUniform3f(glGetUniformLocation(shaderID, ("light[" + std::to_string(x) + "]").c_str()), light[x].x,light[x].y,light[x].z);*/
 
 	glUniform3f(glGetUniformLocation(shaderID, "camPos"), camPos.x,camPos.y,camPos.z);
-	
+
+	GLint textloc  = glGetUniformLocation(shaderID, "texBuff");
+
 	glEnable(GL_DEPTH_TEST);
 
 	su.setScale(0.5f);
@@ -205,7 +211,7 @@ int main()
 		rotateZ=rotateX=rotateY = 0;
 		escala = 1;
 		
-		su.draw(modelLoc);							
+		su.draw(modelLoc, textloc);							
 
 		glfwSwapBuffers(window);
 	}
