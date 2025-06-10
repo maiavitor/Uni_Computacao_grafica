@@ -1,6 +1,6 @@
 #pragma once
 #include "loadObj.h"
-
+#include "Shader.h"
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
 
@@ -41,13 +41,15 @@ public:
 	        model = glm::translate(model, glm::vec3(d, k, s));
 	        }
 
-	void draw(const GLint modelloc, const GLint textloc) const {
+	void draw(const Shader shader) const {
+
 			glActiveTexture(GL_TEXTURE0);
 			glBindTexture(GL_TEXTURE_2D, textID);
 			
 			glBindVertexArray(VAO);
-			glUniformMatrix4fv(modelloc, 1, GL_FALSE, glm::value_ptr(model));
-			glUniform1i(textloc,0);
+			shader.setMat4("model", glm::value_ptr(model));
+			shader.setInt("texBuff",0);
+
 			glDrawArrays(GL_TRIANGLES, 0 , nVertices);
 			glBindVertexArray(0);
 			
@@ -140,13 +142,13 @@ public:
 	        if (word == "Ka") 
         		ssline >> ka.r >> ka.g >> ka.b;
 	        		
-        	else if (word == "Kd")
+        	else if (word == "Ke")
         		ssline >> kd.r >> kd.g >> kd.b;
 	        	
         	else if (word == "Ks")
         		ssline >> ks.r >> ks.g >> ks.b;
 	     	
-	        else
+	        else if (word == "Ns")
         		ssline >> specular;
 		}
 	}

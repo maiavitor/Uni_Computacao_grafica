@@ -25,108 +25,17 @@ using namespace std;
 #include <glm/gtc/type_ptr.hpp>
 #include "model.h"
 #include "loadObj.h"
+#include "Shader.h"
 
 // Protótipo da função de callback de teclado
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mode);
 
-// Protótipos das funções
-int setupShader();
-int setupGeometry();
-
-// Dimensões da janela (pode ser alterado em tempo de execução)
+// Dimensões da janela
 const GLuint WIDTH = 1000, HEIGHT = 1000;
-
-
-// Código fonte do Vertex Shader (em GLSL): ainda hardcoded
-const GLchar* vertexShaderSource = R"(
-#version 400
-layout (location = 0) in vec3 position;
-layout (location = 1) in vec3 normal;
-layout (location = 2) in vec2 texc;
-
-
-uniform mat4 model;
-
-
-out vec3 vNormal;
-out vec4 fragPos; 
-
-out vec2 texcoord;
-
-void main()
-{
-   	gl_Position = model * vec4(position.x, position.y, position.z, 1.0);
-	fragPos = model * vec4(position.x, position.y, position.z, 1.0);
-	vNormal = normal;
-	texcoord = vec2(texc.x, 1 - texc.y);
-})";
-
-//Códifo fonte do Fragment Shader (em GLSL): ainda hardcoded
-const GLchar* fragmentShaderSource = R"(
-#version 400
-
-uniform sampler2D texBuff;
-
-uniform vec3 lightPos;
-uniform vec3 lightColor;
-uniform vec3 camPos;
-
-uniform vec3 ka;
-uniform vec3 kd;
-uniform vec3 ks;
-uniform float q;
-
-out vec4 color;
-
-in vec4 fragPos;
-in vec3 vNormal;
-in vec4 vColor;
-in vec2 texcoord;
-
-void main()
-{
-
-	vec4 objectColor = vec4(texture(texBuff,texcoord).rgb,1.0);
-
-	//Coeficiente de luz ambiente
-	vec3 ambient =  lightColor * ka ;
-
-	//Coeficiente de reflexão difusa
-	vec3 N = normalize(vNormal);
-
-	vec3 specular = ks;
-	vec3 L;
-	float diff, spec;
-	vec3 diffuse = kd;
-	vec3 R, V;
-
-	L = normalize(lightPos - vec3(fragPos));
-	diff = max(dot(N, L),0.0);
-	diffuse += diff * lightColor;
-
-	//Coeficiente de reflexão especular
-	R = normalize(reflect(-L,N));
-	V = normalize(camPos - vec3(fragPos));
-	spec = max(dot(R,V),0.0);
-	spec = pow(spec,q);
-	specular += (ks * spec * lightColor); 
-
-
-
-	vec3 result = (ambient + diffuse) * vec3(objectColor) + specular;
-	color = vec4(result,1.0);
-
-})";
 
 GLfloat  rotateX=0.0, rotateY=0.0, rotateZ=0.0, dir_a=0.0, dir_d=0.0 ,dir_w=0.0, dir_s=0.0;
 GLfloat dir_i=0.0, dir_k=0.0, escala=1.0f;
 
-int imodelo=0;
-glm::vec3 light[3] = {
-		glm::vec3(0.9, 0.8, 0.9), // Key 0.7, 0.0, 0.9
-		glm::vec3(-0.9, -0.8, 0.0), // Fill
-		glm::vec3(1.0, -0.5, -5.0) // Back
-	};
 // Função MAIN
 int main()
 {
@@ -152,34 +61,34 @@ int main()
 
 
 	// Compilando e buildando o programa de shader
-	GLuint shaderID = setupShader();
+	Shader shader("../shader/vertex.glsl","../shader/fragment.glsl"); 
 	
-	glUseProgram(shaderID);
+	shader.Use();
 
 	//inicializando os objetos com buffer, indices, e matriz
 	modelo su = modelo();
 
-	glm::vec3 camPos = glm::vec3(0.0,0.0,-3.0);
+	glm::vec3 camPos = glm::vec3(0.0f,0.0f,2.0f);
 
-	GLint modelLoc = glGetUniformLocation(shaderID, "model");
 	su.loadTexture("../assets/Modelos3D/Suzanne.png");
+	
 	su.loadMTL("../assets/Modelos3D/Suzanne.mtl");
 
+	std::cout << su.ka.x << "+" << su.ka.y << "+" << su.ka.z << std::endl;
+	std::cout << su.kd.x << "+" << su.kd.y << "+" << su.kd.z << std::endl;
+	std::cout << su.ks.x << "+" << su.ks.y << "+" << su.ks.z << std::endl;
+	std::cout << su.specular << std::endl;
 
-	std::cout << su.ks.x;
+	
+	shader.setVec3("lightColor", 1.0f, 1.0f, 1.0f);
 
-
-	glUniform3f(glGetUniformLocation(shaderID, "lightColor"), su.ka.x,su.ka.y,su.ka.z);
-	glUniform3f(glGetUniformLocation(shaderID, "ka"), su.ka.x,su.ka.y,su.ka.z);
-	glUniform3f(glGetUniformLocation(shaderID, "kd"), su.kd.x,su.kd.y,su.kd.z);
-	glUniform3f(glGetUniformLocation(shaderID, "ks"), su.ks.x,su.ks.y,su.ks.z);
-	glUniform1f(glGetUniformLocation(shaderID, "q"), su.specular);
-	/*for (int x = 0; x < 3; x++)
-		glUniform3f(glGetUniformLocation(shaderID, ("light[" + std::to_string(x) + "]").c_str()), light[x].x,light[x].y,light[x].z);*/
-
-	glUniform3f(glGetUniformLocation(shaderID, "camPos"), camPos.x,camPos.y,camPos.z);
-
-	GLint textloc  = glGetUniformLocation(shaderID, "texBuff");
+	shader.setVec3("ka", su.ka.x,su.ka.y,su.ka.z);
+	shader.setVec3("kd", 0.0f, 0.0f, 0.0f);
+	shader.setVec3("ks", su.ks.x,su.ks.y,su.ks.z);
+	shader.setFloat("q", su.specular);
+	
+	shader.setVec3("lightPos", 1.0f, 0.5f, -1.0f);
+	shader.setVec3("camPos", camPos.x,camPos.y,camPos.z);
 
 	glEnable(GL_DEPTH_TEST);
 
@@ -211,7 +120,7 @@ int main()
 		rotateZ=rotateX=rotateY = 0;
 		escala = 1;
 		
-		su.draw(modelLoc, textloc);							
+		su.draw(shader);							
 
 		glfwSwapBuffers(window);
 	}
@@ -286,59 +195,6 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 	if (key == GLFW_KEY_RIGHT_BRACKET && (action == GLFW_PRESS || GLFW_REPEAT))
 	{
 		escala -= 0.02f;		
-	}
-	
-	if (key == GLFW_KEY_F && action == GLFW_RELEASE)
-	{
-		imodelo =  (1+imodelo) % 2;		
-	}
-
+	}	
 }
 
-//Esta função está basntante hardcoded - objetivo é compilar e "buildar" um programa de
-// shader simples e único neste exemplo de código
-// O código fonte do vertex e fragment shader está nos arrays vertexShaderSource e
-// fragmentShader source no iniçio deste arquivo
-// A função retorna o identificador do programa de shader
-int setupShader()
-{
-	// Vertex shader
-	GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
-	glShaderSource(vertexShader, 1, &vertexShaderSource, NULL);
-	glCompileShader(vertexShader);
-	// Checando erros de compilação (exibição via log no terminal)
-	GLint success;
-	GLchar infoLog[512];
-	glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &success);
-	if (!success)
-	{
-		glGetShaderInfoLog(vertexShader, 512, NULL, infoLog);
-		std::cout << "ERROR::SHADER::VERTEX::COMPILATION_FAILED\n" << infoLog << std::endl;
-	}
-	// Fragment shader
-	GLuint fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-	glShaderSource(fragmentShader, 1, &fragmentShaderSource, NULL);
-	glCompileShader(fragmentShader);
-	// Checando erros de compilação (exibição via log no terminal)
-	glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &success);
-	if (!success)
-	{
-		glGetShaderInfoLog(fragmentShader, 512, NULL, infoLog);
-		std::cout << "ERROR::SHADER::FRAGMENT::COMPILATION_FAILED\n" << infoLog << std::endl;
-	}
-	// Linkando os shaders e criando o identificador do programa de shader
-	GLuint shaderProgram = glCreateProgram();
-	glAttachShader(shaderProgram, vertexShader);
-	glAttachShader(shaderProgram, fragmentShader);
-	glLinkProgram(shaderProgram);
-	// Checando por erros de linkagem
-	glGetProgramiv(shaderProgram, GL_LINK_STATUS, &success);
-	if (!success) {
-		glGetProgramInfoLog(shaderProgram, 512, NULL, infoLog);
-		std::cout << "ERROR::SHADER::PROGRAM::LINKING_FAILED\n" << infoLog << std::endl;
-	}
-	glDeleteShader(vertexShader);
-	glDeleteShader(fragmentShader);
-
-	return shaderProgram;
-}
