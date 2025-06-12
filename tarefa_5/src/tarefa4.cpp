@@ -1,11 +1,3 @@
-/* Hello Triangle - código adaptado de https://learnopengl.com/#!Getting-started/Hello-Triangle
- *
- * Adaptado por Rossana Baptista Queiroz
- * para as disciplinas de Processamento Gráfico/Computação Gráfica - Unisinos
- * Versão inicial: 7/4/2017
- * Última atualização em 07/03/2025
- */
-
 #include <iostream>
 #include <string>
 #include <assert.h>
@@ -23,6 +15,8 @@ using namespace std;
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
+
+//internal includes
 #include "model.h"
 #include "loadObj.h"
 #include "Shader.h"
@@ -33,7 +27,7 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 // Dimensões da janela
 const GLuint WIDTH = 1000, HEIGHT = 1000;
 
-GLfloat  rotateX=0.0, rotateY=0.0, rotateZ=0.0, dir_a=0.0, dir_d=0.0 ,dir_w=0.0, dir_s=0.0;
+GLfloat rotateX=0.0, rotateY=0.0, rotateZ=0.0, dir_a=0.0, dir_d=0.0 ,dir_w=0.0, dir_s=0.0;
 GLfloat dir_i=0.0, dir_k=0.0, escala=1.0f;
 
 // Função MAIN
@@ -57,6 +51,7 @@ int main()
 	// Definindo as dimensões da viewport com as mesmas dimensões da janela da aplicação
 	int width, height;
 	glfwGetFramebufferSize(window, &width, &height);
+
 	glViewport(0, 0, width, height);
 
 
@@ -73,12 +68,6 @@ int main()
 	su.loadTexture("../assets/Modelos3D/Suzanne.png");
 	
 	su.loadMTL("../assets/Modelos3D/Suzanne.mtl");
-
-	std::cout << su.ka.x << "+" << su.ka.y << "+" << su.ka.z << std::endl;
-	std::cout << su.kd.x << "+" << su.kd.y << "+" << su.kd.z << std::endl;
-	std::cout << su.ks.x << "+" << su.ks.y << "+" << su.ks.z << std::endl;
-	std::cout << su.specular << std::endl;
-
 	
 	shader.setVec3("lightColor", 1.0f, 1.0f, 1.0f);
 
