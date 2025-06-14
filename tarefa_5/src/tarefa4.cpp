@@ -65,24 +65,17 @@ int main()
 
 	glm::vec3 camPos = glm::vec3(0.0f,0.0f,2.0f);
 
-	su.loadTexture("../assets/Modelos3D/Suzanne.png");
-	
-	su.loadMTL("../assets/Modelos3D/Suzanne.mtl");
-	
 	shader.setVec3("lightColor", 1.0f, 1.0f, 1.0f);
 
 	shader.setVec3("ka", su.ka.x,su.ka.y,su.ka.z);
 	shader.setVec3("kd", su.kd.x, su.kd.y, su.kd.z);
 	shader.setVec3("ks", su.ks.x,su.ks.y,su.ks.z);
-	shader.setFloat("q", su.specular);
+	shader.setFloat("q", su.specular * 10);
 	
 	shader.setVec3("lightPos", 1.0f, 0.5f, -1.0f);
 	shader.setVec3("camPos", camPos.x,camPos.y,camPos.z);
 
 	glEnable(GL_DEPTH_TEST);
-
-	su.setScale(0.5f);
-	su.setRotation(180.0f, 'y');
 
 	//parametros texturas
 	
