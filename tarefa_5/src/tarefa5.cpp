@@ -20,6 +20,7 @@ using namespace std;
 #include "model.h"
 #include "loadObj.h"
 #include "Shader.h"
+#include "camera.h"
 
 // Protótipo da função de callback de teclado
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mode);
@@ -63,7 +64,7 @@ int main()
 	//inicializando os objetos com buffer, indices, e matriz
 	modelo su = modelo();
 
-	glm::vec3 camPos = glm::vec3(0.0f,0.0f,2.0f);
+	Camera camera = Camera(shader);
 
 	shader.setVec3("lightColor", 1.0f, 1.0f, 1.0f);
 
@@ -73,7 +74,6 @@ int main()
 	shader.setFloat("q", su.specular * 10);
 	
 	shader.setVec3("lightPos", 1.0f, 0.5f, -1.0f);
-	shader.setVec3("camPos", camPos.x,camPos.y,camPos.z);
 
 	glEnable(GL_DEPTH_TEST);
 
