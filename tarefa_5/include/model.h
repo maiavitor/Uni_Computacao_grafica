@@ -36,17 +36,17 @@ public:
 	        }
 
 	void draw(const Shader shader) const {
+		
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, textID);
+		
+		glBindVertexArray(VAO);
+		shader.setMat4("model", glm::value_ptr(model));
+		shader.setInt("texBuff",0);
 
-			glActiveTexture(GL_TEXTURE0);
-			glBindTexture(GL_TEXTURE_2D, textID);
-			
-			glBindVertexArray(VAO);
-			shader.setMat4("model", glm::value_ptr(model));
-			shader.setInt("texBuff",0);
-
-			glDrawArrays(GL_TRIANGLES, 0 , nVertices);
-			glBindVertexArray(0);
-			
+		glDrawArrays(GL_TRIANGLES, 0 , nVertices);
+		glBindVertexArray(0);
+		
 	}
 
 	void setRotation(const GLfloat angle, char axis){
@@ -71,6 +71,7 @@ public:
 	const glm::mat4& getModelMatrix() const noexcept {
 	        return model;
 	    }
-    
+
+        
 };
 

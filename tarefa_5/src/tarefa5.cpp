@@ -31,6 +31,10 @@ const GLuint WIDTH = 1000, HEIGHT = 1000;
 GLfloat rotateX=0.0, rotateY=0.0, rotateZ=0.0, dir_a=0.0, dir_d=0.0 ,dir_w=0.0, dir_s=0.0;
 GLfloat dir_i=0.0, dir_k=0.0, escala=1.0f;
 
+//objetos globais
+
+Camera camera = Camera();
+
 // Função MAIN
 int main()
 {
@@ -57,14 +61,15 @@ int main()
 
 
 	// Compilando e buildando o programa de shader
-	Shader shader("../shader/vertex.glsl","../shader/fragment.glsl"); 
+
+	Shader shader("../shader/vertex.glsl","../shader/fragment.glsl"); 		
 	
 	shader.Use();
 
 	//inicializando os objetos com buffer, indices, e matriz
 	modelo su = modelo();
 
-	Camera camera = Camera(shader);
+	
 
 	shader.setVec3("lightColor", 1.0f, 1.0f, 1.0f);
 
@@ -72,8 +77,12 @@ int main()
 	shader.setVec3("kd", su.kd.x, su.kd.y, su.kd.z);
 	shader.setVec3("ks", su.ks.x,su.ks.y,su.ks.z);
 	shader.setFloat("q", su.specular * 10);
-	
+
 	shader.setVec3("lightPos", 1.0f, 0.5f, -1.0f);
+
+	shader.setMat4("projection", glm::value_ptr(camera.projection));
+	
+
 
 	glEnable(GL_DEPTH_TEST);
 
@@ -88,6 +97,8 @@ int main()
 		glClearColor(0.0f, 0.0f, 0.0f, 0.0f); //cor de fundo
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+		shader.setVec3("camPos", camera.cameraPos.x, camera.cameraPos.y, camera.cameraPos.z);
+
 		glBindVertexArray(0);
 
 		su.setScale(escala);
@@ -98,9 +109,10 @@ int main()
 
 		su.setTransf(dir_a,dir_d,dir_s,dir_w,dir_i,dir_k);
 
-		dir_a=dir_d=dir_s=dir_w=dir_i=dir_k = 0;
 		rotateZ=rotateX=rotateY = 0;
 		escala = 1;
+
+		shader.setMat4("view", glm::value_ptr(camera.getView()));
 		
 		su.draw(shader);							
 
@@ -138,25 +150,25 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 		rotateZ += 1.7f;
 	}
 	
-	if (key == GLFW_KEY_A && (action == GLFW_PRESS || GLFW_REPEAT))
+	if (key == GLFW_KEY_A && (action == GLFW_PRESS))
 	{
 		
-		dir_a -= 0.02f;
+		camera.keyMovement("direita");
 	}
 
-	if (key == GLFW_KEY_D && (action == GLFW_PRESS || GLFW_REPEAT))
+	if (key == GLFW_KEY_D && (action == GLFW_PRESS ))
 	{
-		dir_d += 0.02f;
+		camera.keyMovement("esquerda");
 	}
 	
-	if (key == GLFW_KEY_W && (action == GLFW_PRESS || GLFW_REPEAT))
+	if (key == GLFW_KEY_W && (action == GLFW_PRESS ))
 	{
-		dir_w += 0.02f;		
+		camera.keyMovement("frente");		
 	}
 	
-	if (key == GLFW_KEY_S && (action == GLFW_PRESS || GLFW_REPEAT))
+	if (key == GLFW_KEY_S && (action == GLFW_PRESS ))
 	{
-		dir_s -= 0.02f;	
+		camera.keyMovement("tras");	
 	}
 
 	if (key == GLFW_KEY_I && (action == GLFW_PRESS || GLFW_REPEAT))
