@@ -27,13 +27,13 @@ private:
 public:	
 
 	glm::mat4 view, projection = glm::mat4(1);
-	glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 2.0f);
+	glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 0.0f);
 
 	Camera(){
 
 		updateCamera();
 							
-		projection = glm::perspective(glm::radians(45.0f), 1000.0f / 1000.0f, 0.1f, 100.0f);
+		projection = glm::perspective(glm::radians(45.0f), 800.0f / 600.0f, 0.1f, 100.0f);
 		
 
 	}
@@ -63,6 +63,26 @@ public:
 
 	glm::mat4 getView(){
 		return glm::lookAt(cameraPos, cameraPos + Front, Up);
+	}
+
+	void processMouse(float xoffset, float yoffset){
+		xoffset *= 0.1f;
+		yoffset *= 0.1f;
+
+		Yaw   += xoffset;
+		Pitch += yoffset;
+
+
+		if (Pitch > 89.0f)
+			Pitch = 89.0f;
+		if (Pitch < -89.0f)
+			Pitch = -89.0f;
+
+
+		
+		
+
+		updateCamera();
 	}
     
 };

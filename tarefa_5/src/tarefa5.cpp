@@ -24,16 +24,24 @@ using namespace std;
 
 // Protótipo da função de callback de teclado
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mode);
+void mouse_callback(GLFWwindow* window, double xposIn, double yposIn);
 
 // Dimensões da janela
-const GLuint WIDTH = 1000, HEIGHT = 1000;
+const GLuint WIDTH = 800, HEIGHT = 600;
 
-GLfloat rotateX=0.0, rotateY=0.0, rotateZ=0.0, dir_a=0.0, dir_d=0.0 ,dir_w=0.0, dir_s=0.0;
+GLfloat rotateX=0.0, rotateY=0.0, rotateZ=0.0;
 GLfloat dir_i=0.0, dir_k=0.0, escala=1.0f;
 
 //objetos globais
 
 Camera camera = Camera();
+
+//variaveis globais
+
+float lastX = 800.0f / 2.0f;
+float lastY = 600.0f / 2.0f;
+
+bool firstmouse = true;
 
 // Função MAIN
 int main()
@@ -41,11 +49,14 @@ int main()
 	glfwInit();
 
 	// Criação da janela GLFW
-	GLFWwindow* window = glfwCreateWindow(WIDTH, HEIGHT, "Ola 3D -- Vitor Maia!", nullptr, nullptr);
+	GLFWwindow* window = glfwCreateWindow(WIDTH, HEIGHT, "Ola 3D -- Vitor Maia!", NULL, nullptr);
 	glfwMakeContextCurrent(window);
 
 	// Fazendo o registro da função de callback para a janela GLFW
 	glfwSetKeyCallback(window, key_callback);
+	glfwSetCursorPosCallback(window, mouse_callback);
+	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+	
 
 	// GLAD: carrega todos os ponteiros d funções da OpenGL
 	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
@@ -56,7 +67,6 @@ int main()
 	// Definindo as dimensões da viewport com as mesmas dimensões da janela da aplicação
 	int width, height;
 	glfwGetFramebufferSize(window, &width, &height);
-
 	glViewport(0, 0, width, height);
 
 
@@ -107,8 +117,7 @@ int main()
 		su.setRotation(rotateY, 'y');
 		su.setRotation(rotateZ, 'z');
 
-		su.setTransf(dir_a,dir_d,dir_s,dir_w,dir_i,dir_k);
-
+		
 		rotateZ=rotateX=rotateY = 0;
 		escala = 1;
 
@@ -190,5 +199,25 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 	{
 		escala -= 0.02f;		
 	}	
+}
+
+void mouse_callback(GLFWwindow* window, double xposIn, double yposIn){
+	float xpos = static_cast<float>(xposIn);
+	float ypos = static_cast<float>(yposIn);
+
+	if (firstmouse) {
+		lastX = xpos;
+		lastY = ypos;
+		firstmouse = false;
+	}
+
+	float xoffset = xpos - lastX;
+	float yoffset = lastY - ypos;
+
+	lastX = xpos;
+	lastY = ypos;
+
+	camera.processMouse(xoffset, yoffset);
+
 }
 
