@@ -4,4 +4,4 @@ exercicio sobre iluminação phong, combinando iluminação ambiente, difusa e e
 
 ## Demo
 
-![GIF](https://imgur.com/a/aqcmF3d)
+![GIF](https://i.imgur.com/nhxf2Wt.gif)
