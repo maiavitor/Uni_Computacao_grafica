@@ -55,7 +55,7 @@ int main()
 	// Fazendo o registro da função de callback para a janela GLFW
 	glfwSetKeyCallback(window, key_callback);
 	glfwSetCursorPosCallback(window, mouse_callback);
-	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+	//qglfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 	
 
 	// GLAD: carrega todos os ponteiros d funções da OpenGL
@@ -78,8 +78,6 @@ int main()
 
 	//inicializando os objetos com buffer, indices, e matriz
 	modelo su = modelo();
-
-	
 
 	shader.setVec3("lightColor", 1.0f, 1.0f, 1.0f);
 

@@ -24,7 +24,6 @@ public:
 			textID = loadTexture("../assets/Modelos3D/Suzanne.png", w, h);
 			loadMTL("../assets/Modelos3D/Suzanne.mtl", ka, kd, ks, specular);
 			model = glm::mat4(1.0f);
-			setRotation(180.0f, 'y');
 			setScale(0.5f);
 		}
 

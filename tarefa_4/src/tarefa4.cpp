@@ -142,13 +142,13 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 	if (key == GLFW_KEY_X && (action == GLFW_PRESS || GLFW_REPEAT))
 	{
 		
-		rotateX += 1.7f;		
+		rotateX += 2.3f;		
 	}
 
 	if (key == GLFW_KEY_Y && (action == GLFW_PRESS || GLFW_REPEAT))
 	{
 		
-		rotateY += 1.7f;		
+		rotateY += 2.3f;		
 	}
 
 	if (key == GLFW_KEY_Z && (action == GLFW_PRESS || GLFW_REPEAT))
