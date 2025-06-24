@@ -8,4 +8,4 @@ exercicio sobre criação de uma camera, o codigo é baseado em uma versão de v
 
 ## Demo
 
-![GIF](https://imgur.com/a/bZsTR6D)
+![GIF](https://i.imgur.com/L4Du62A.gif)
