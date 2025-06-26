@@ -27,6 +27,7 @@ using namespace std;
 // Protótipo da função de callback de teclado
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mode);
 void mouse_callback(GLFWwindow* window, double xposIn, double yposIn);
+void GLcheckError();
 
 // Dimensões da janela
 const GLuint WIDTH = 800, HEIGHT = 600;
@@ -45,9 +46,6 @@ float lastY = 600.0f / 2.0f;
 
 bool firstmouse = true;
 
-int bezierAsteroidsPointOnCurveIterReference = 0;
-vector<glm::vec3> pointsOnCurveVector;
-int bezierAsteroidsNbCurvePoints = 0;
 
 // Função MAIN
 int main()
@@ -59,6 +57,7 @@ int main()
 	glfwMakeContextCurrent(window);
 
 	// Fazendo o registro da função de callback para a janela GLFW
+
 	glfwSetKeyCallback(window, key_callback);
 	//glfwSetCursorPosCallback(window, mouse_callback);
 	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
@@ -71,6 +70,7 @@ int main()
 	}
 
 	// Definindo as dimensões da viewport com as mesmas dimensões da janela da aplicação
+
 	int width, height;
 	glfwGetFramebufferSize(window, &width, &height);
 	glViewport(0, 0, width, height);
@@ -83,18 +83,9 @@ int main()
 	shader.Use();
 
 	//inicializando os objetos com buffer, indices, e matriz
-	modelo su = modelo();
-	//su.setTransf(glm::vec3(0.0f,0.0f,6.0f));
+	modelo su = modelo(shader);
 	
-
-	shader.setVec3("lightColor", 1.0f, 1.0f, 1.0f);
-
-	shader.setVec3("ka", su.ka.x,su.ka.y,su.ka.z);
-	shader.setVec3("kd", su.kd.x, su.kd.y, su.kd.z);
-	shader.setVec3("ks", su.ks.x,su.ks.y,su.ks.z);
-	shader.setFloat("q", su.specular * 10);
-
-	shader.setVec3("lightPos", 1.0f, 0.5f, -1.0f);
+	su.lightPos = glm::vec3(1.0f, 0.5f, -1.0f);
 
 	shader.setMat4("projection", glm::value_ptr(camera.projection));
 	
@@ -110,7 +101,6 @@ int main()
 	
 	glEnable(GL_DEPTH_TEST);
 	int i = 0;
-	//parametros texturas
 	
 	// Loop da aplicação - "game loop"
 	while (!glfwWindowShouldClose(window))
@@ -135,18 +125,18 @@ int main()
 		rotateZ=rotateX=rotateY = 0;
 		escala = 1;
 		
-		shader.setMat4("view", glm::value_ptr(camera.getView()));
+		shader.setMat4("view",glm::value_ptr(camera.getView()));
 		
 		if (i == curve.getPoint()){
 			i = 0;
 		}
 
-		std::cout << i << std::endl;
+		//std::cout << i << std::endl;
 		
 		su.setTransf(glm::translate(glm::mat4(1.0f),curve.getPointsCurve(i)));
 		
-		su.draw(shader);							
-	
+		su.draw();							
+		GLcheckError();
 		glfwSwapBuffers(window);
 
 		i++;
@@ -243,5 +233,12 @@ void mouse_callback(GLFWwindow* window, double xposIn, double yposIn){
 
 	camera.processMouse(xoffset, yoffset);
 
+}
+
+void GLcheckError(){
+	GLenum err;
+	while ( (err = glGetError()) != GL_NO_ERROR) {
+		std::cout << err << std::endl;
+	}
 }
 

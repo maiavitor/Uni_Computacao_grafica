@@ -7,19 +7,21 @@ class modelo {
 private:
 	GLuint VAO, textID;
 	glm::mat4 model;
-	
+	Shader& shader;	
 	int nVertices;
 	int w,h;
 	
 public:	
-
+	glm::vec3 lightPos = glm::vec3(1.0f);	
+	glm::vec3 lightColor = glm::vec3(1.0f);
 	glm::vec3 ka = glm::vec3(1.0f);
     glm::vec3 kd = glm::vec3(1.0f);
     glm::vec3 ks = glm::vec3(1.0f);
     GLfloat specular = 1.0f; 
 
 
-	modelo(){
+	modelo( Shader& s):shader(s){
+			
 			VAO = loadSimpleOBJ("../assets/Modelos3D/Suzanne.obj", nVertices);				
 			textID = loadTexture("../assets/Modelos3D/Suzanne.png", w, h);
 			loadMTL("../assets/Modelos3D/Suzanne.mtl", ka, kd, ks, specular);
@@ -27,7 +29,6 @@ public:
 			setRotation(180.0f, 'y');
 			setScale(0.5f);
 		}
-
 	void setTransf(glm::mat4 m){
 		model = m;
 	}
@@ -37,13 +38,18 @@ public:
 	        model = glm::translate(model, glm::vec3(d, k, s));
 	        }
 
-	void draw(const Shader shader) const {
+	void draw()  {
 		
 		
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, textID);
 		
 		glBindVertexArray(VAO);
+
+		shader.setVec3("ka", ka.x, ka.y, ka.z);
+		shader.setVec3("kd", kd.x, kd.y, kd.z);
+		shader.setVec3("ks", ks.x, ks.y, ks.z);
+
 		shader.setMat4("model", glm::value_ptr(model));
 		shader.setInt("texBuff",0);
 
