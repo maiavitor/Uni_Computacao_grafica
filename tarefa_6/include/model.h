@@ -12,7 +12,7 @@ private:
 	int w,h;
 	
 public:	
-	glm::vec3 lightPos = glm::vec3(1.0f);	
+	glm::vec3 lightPos = glm::vec3(1.0f, 0.5f, -1.0f);	
 	glm::vec3 lightColor = glm::vec3(1.0f);
 	glm::vec3 ka = glm::vec3(1.0f);
     glm::vec3 kd = glm::vec3(1.0f);
@@ -49,7 +49,10 @@ public:
 		shader.setVec3("ka", ka.x, ka.y, ka.z);
 		shader.setVec3("kd", kd.x, kd.y, kd.z);
 		shader.setVec3("ks", ks.x, ks.y, ks.z);
-
+		shader.setFloat("q", specular);
+		shader.setVec3("lightPos", lightPos.x, lightPos.y, lightPos.z);
+		shader.setVec3("lightColor", lightColor.x, lightColor.y, lightColor.z);
+		
 		shader.setMat4("model", glm::value_ptr(model));
 		shader.setInt("texBuff",0);
 
