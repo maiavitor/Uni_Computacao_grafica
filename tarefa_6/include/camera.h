@@ -3,7 +3,7 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
-
+#include <GLFW/glfw3.h>
 
 #include "Shader.h"
  
@@ -35,7 +35,6 @@ public:
 							
 		projection = glm::perspective(glm::radians(45.0f), 800.0f / 600.0f, 0.1f, 100.0f);
 		
-
 	}
 
 	void keyMovement(const char* mov){
@@ -77,10 +76,6 @@ public:
 			Pitch = 89.0f;
 		if (Pitch < -89.0f)
 			Pitch = -89.0f;
-
-
-		
-		
 
 		updateCamera();
 	}

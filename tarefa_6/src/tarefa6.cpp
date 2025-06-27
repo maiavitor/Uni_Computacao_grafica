@@ -6,10 +6,7 @@
 
 using namespace std;
 
-// GLAD
 #include <glad/glad.h>
-
-// GLFW
 #include <GLFW/glfw3.h>
 
 //GLM
@@ -17,17 +14,15 @@ using namespace std;
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/gtx/string_cast.hpp>
+
 //internal includes
 #include "model.h"
-#include "loadObj.h"
 #include "Shader.h"
 #include "camera.h"
-#include "bezier.h"
 
 // Protótipo da função de callback de teclado
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mode);
 void mouse_callback(GLFWwindow* window, double xposIn, double yposIn);
-void GLcheckError();
 
 // Dimensões da janela
 const GLuint WIDTH = 800, HEIGHT = 600;
@@ -41,8 +36,8 @@ Camera camera = Camera();
 
 //variaveis globais
 
-float lastX = 800.0f / 2.0f;
-float lastY = 600.0f / 2.0f;
+float lastX = 0.0f;
+float lastY = 0.0f;
 
 bool firstmouse = true;
 
@@ -59,9 +54,9 @@ int main()
 	// Fazendo o registro da função de callback para a janela GLFW
 
 	glfwSetKeyCallback(window, key_callback);
-	//glfwSetCursorPosCallback(window, mouse_callback);
-	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 	
+	//glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+	glfwSetCursorPosCallback(window, mouse_callback);
 
 	// GLAD: carrega todos os ponteiros d funções da OpenGL
 	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
@@ -75,29 +70,13 @@ int main()
 	glfwGetFramebufferSize(window, &width, &height);
 	glViewport(0, 0, width, height);
 
-
-	// Compilando e buildando o programa de shader
-
 	Shader shader("../shader/vertex.glsl","../shader/fragment.glsl"); 		
 	
 	shader.Use();
 
-	//inicializando os objetos com buffer, indices, e matriz
-	modelo su = modelo(shader);
-	
-	su.lightPos = glm::vec3(1.0f, 0.5f, -1.0f);
+	modelo su = modelo(shader, 112, 45, 2.0f );
 
 	shader.setMat4("projection", glm::value_ptr(camera.projection));
-	
-	Bezier curve = Bezier();
-	curve.generateCircleControlPointsSet(10, 1.0f);
-
-	for(int i = 0; i < curve.getCPSize(); i++){
-		std::cout <<"control point: " << glm::to_string(curve.getCP(i)) << std::endl;
-	}
-
-	curve.generateCurve(60);
-
 	
 	glEnable(GL_DEPTH_TEST);
 	int i = 0;
@@ -105,7 +84,7 @@ int main()
 	// Loop da aplicação - "game loop"
 	while (!glfwWindowShouldClose(window))
 	{
-		// Checa se houveram eventos de input (key pressed, mouse moved etc.) e chama as funções de callback correspondentes
+
 		glfwPollEvents();
 
 		glClearColor(0.0f, 0.0f, 0.0f, 0.0f); //cor de fundo
@@ -127,22 +106,12 @@ int main()
 		
 		shader.setMat4("view",glm::value_ptr(camera.getView()));
 		
-		if (i == curve.getPoint()){
-			i = 0;
-		}
+		su.draw(i);
 
-		//std::cout << i << std::endl;
-		
-		su.setTransf(glm::translate(glm::mat4(1.0f),curve.getPointsCurve(i)));
-		
-		su.draw();							
-		GLcheckError();
 		glfwSwapBuffers(window);
 
 		i++;
 	}
-	// Pede pra OpenGL desalocar os buffers
-	// Finaliza a execução da GLFW, limpando os recursos alocados por ela
 	
 	glfwTerminate();
 	return 0;
@@ -219,10 +188,12 @@ void mouse_callback(GLFWwindow* window, double xposIn, double yposIn){
 	float xpos = static_cast<float>(xposIn);
 	float ypos = static_cast<float>(yposIn);
 
+	
 	if (firstmouse) {
 		lastX = xpos;
 		lastY = ypos;
 		firstmouse = false;
+		std::cout << firstmouse << std::endl;
 	}
 
 	float xoffset = xpos - lastX;
@@ -230,15 +201,8 @@ void mouse_callback(GLFWwindow* window, double xposIn, double yposIn){
 
 	lastX = xpos;
 	lastY = ypos;
-
+	
 	camera.processMouse(xoffset, yoffset);
 
-}
 
-void GLcheckError(){
-	GLenum err;
-	while ( (err = glGetError()) != GL_NO_ERROR) {
-		std::cout << err << std::endl;
-	}
 }
-
