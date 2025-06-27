@@ -24,13 +24,13 @@ public:
 	int points, steps;
 	float radius;	
 
-	modelo(Shader& s, int points, int steps, float radius) : shader(s), points(points) , steps(steps), radius(radius) {
+	modelo(Shader& s, int points, int steps, float radius, string obj, string mtl, string text) : shader(s), points(points) , steps(steps), radius(radius) {
 			
-		VAO = loadSimpleOBJ("../assets/Modelos3D/Suzanne.obj", nVertices);				
+		VAO = loadSimpleOBJ(obj, nVertices);				
 		
 		int w,h;
-		textID = loadTexture("../assets/Modelos3D/Suzanne.png", w, h);
-		loadMTL("../assets/Modelos3D/Suzanne.mtl", ka, kd, ks, specular);
+		textID = loadTexture(text, w, h);
+		loadMTL(mtl, ka, kd, ks, specular);
 			
 		setRotation(180.0f, 'y');
 		setScale(0.5f);

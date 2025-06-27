@@ -74,7 +74,9 @@ int main()
 	
 	shader.Use();
 
-	modelo su = modelo(shader, 112, 45, 2.0f );
+	modelo modelo1 = modelo(shader, 112, 45, 2.0f, "../assets/Modelos3D/Suzanne.obj", "../assets/Modelos3D/Suzanne.mtl", "../assets/Modelos3D/Suzanne.png");
+	modelo modelo2 = modelo(shader, 98, 38, 1.0f, "../assets/Modelos3D/Suzanne.obj", "../assets/Modelos3D/Suzanne.mtl", "../assets/Modelos3D/Suzanne.png");
+	modelo listModel[2]= {modelo1, modelo2};
 
 	shader.setMat4("projection", glm::value_ptr(camera.projection));
 	
@@ -93,21 +95,13 @@ int main()
 		shader.setVec3("camPos", camera.cameraPos.x, camera.cameraPos.y, camera.cameraPos.z);
 
 		glBindVertexArray(0);
-
-		su.setScale(escala);
-
-		su.setRotation(rotateX, 'x');
-		su.setRotation(rotateY, 'y');
-		su.setRotation(rotateZ, 'z');
-
-		
-		rotateZ=rotateX=rotateY = 0;
-		escala = 1;
 		
 		shader.setMat4("view",glm::value_ptr(camera.getView()));
-		
-		su.draw(i);
 
+		for (int c = 0; c < 2; c++){
+			listModel[c].draw(i);			
+		}		
+		
 		glfwSwapBuffers(window);
 
 		i++;
