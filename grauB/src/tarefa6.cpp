@@ -74,8 +74,8 @@ int main()
 	
 	shader.Use();
 
-	modelo modelo1 = modelo(shader, 112, 45, 2.0f, "../assets/Modelos3D/Suzanne.obj", "../assets/Modelos3D/Suzanne.mtl", "../assets/Modelos3D/Suzanne.png");
-	modelo modelo2 = modelo(shader, 98, 38, 1.0f, "../assets/Modelos3D/Suzanne.obj", "../assets/Modelos3D/Suzanne.mtl", "../assets/Modelos3D/Suzanne.png");
+	modelo modelo1 = modelo(shader,  "../assets/Modelos3D/hill.obj", "../assets/Modelos3D/hill.mtl");
+	modelo modelo2 = modelo(shader,  "../assets/Modelos3D/wizard.obj", "../assets/Modelos3D/wizard.mtl");
 	modelo listModel[2]= {modelo1, modelo2};
 
 	shader.setMat4("projection", glm::value_ptr(camera.projection));
@@ -98,8 +98,10 @@ int main()
 		
 		shader.setMat4("view",glm::value_ptr(camera.getView()));
 
+		
+		
 		for (int c = 0; c < 2; c++){
-			listModel[c].draw(i);			
+			listModel[c].draw();			
 		}		
 		
 		glfwSwapBuffers(window);
