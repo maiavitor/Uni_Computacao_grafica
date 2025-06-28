@@ -9,7 +9,7 @@ exercicio sobre criação uma cena 3D, a fada na cena está fazendo uma curva de
 - 'M' : Muda o modelo selecionado
 - 'X', 'Y', 'Z': rotaciona no eixo selecionado
 
-## Link para apresentação ppt ![apresentação](https://www.canva.com/design/DAGrqlE1kRU/rDFjaoTrVjVeePm0iOZS4w/view?utm_content=DAGrqlE1kRU&utm_campaign=designshare&utm_medium=link2&utm_source=uniquelinks&utlId=he2b36f7cf6)
+## Link para apresentação ppt [link](https://www.canva.com/design/DAGrqlE1kRU/rDFjaoTrVjVeePm0iOZS4w/view?utm_content=DAGrqlE1kRU&utm_campaign=designshare&utm_medium=link2&utm_source=uniquelinks&utlId=he2b36f7cf6)
 
 ## Demo
 
