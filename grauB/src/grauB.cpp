@@ -25,7 +25,7 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 void mouse_callback(GLFWwindow* window, double xposIn, double yposIn);
 
 // Dimensões da janela
-const GLuint WIDTH = 800, HEIGHT = 600;
+const GLuint WIDTH = 1440, HEIGHT = 900;
 
 GLfloat  rotateX=0.0, rotateY=0.0, rotateZ=0.0, dir_a=0.0, dir_d=0.0 ,dir_w=0.0, dir_s=0.0;
 GLfloat dir_i=0.0, dir_k=0.0, escala=1.0f;
@@ -57,7 +57,7 @@ int main()
 
 	glfwSetKeyCallback(window, key_callback);
 	
-	//glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 	glfwSetCursorPosCallback(window, mouse_callback);
 
 	// GLAD: carrega todos os ponteiros d funções da OpenGL
