@@ -27,8 +27,10 @@ void mouse_callback(GLFWwindow* window, double xposIn, double yposIn);
 // Dimensões da janela
 const GLuint WIDTH = 800, HEIGHT = 600;
 
-GLfloat rotateX=0.0, rotateY=0.0, rotateZ=0.0;
+GLfloat  rotateX=0.0, rotateY=0.0, rotateZ=0.0, dir_a=0.0, dir_d=0.0 ,dir_w=0.0, dir_s=0.0;
 GLfloat dir_i=0.0, dir_k=0.0, escala=1.0f;
+int selectmodel = 0;
+
 
 //objetos globais
 
@@ -55,7 +57,7 @@ int main()
 
 	glfwSetKeyCallback(window, key_callback);
 	
-	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+	//glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 	glfwSetCursorPosCallback(window, mouse_callback);
 
 	// GLAD: carrega todos os ponteiros d funções da OpenGL
@@ -76,12 +78,18 @@ int main()
 
 	modelo modelo1 = modelo(shader,  "../assets/Modelos3D/hill.obj", "../assets/Modelos3D/hill.mtl");
 	modelo modelo2 = modelo(shader,  "../assets/Modelos3D/wizard.obj", "../assets/Modelos3D/wizard.mtl");
-	modelo listModel[2]= {modelo1, modelo2};
+	modelo modelo3 = modelo(shader, 120,70, 4.0f, "../assets/Modelos3D/fary.obj", "../assets/Modelos3D/fary.mtl");
+	modelo listModel[3]= {modelo1, modelo2, modelo3};
+
+	glm::vec3 mod = glm::vec3(0.0f,3.10f,1.0f);
 
 	shader.setMat4("projection", glm::value_ptr(camera.projection));
 	
 	glEnable(GL_DEPTH_TEST);
 	int i = 0;
+	listModel[1].moveVec(mod);
+
+	listModel[2].setScale(1.5f);
 	
 	// Loop da aplicação - "game loop"
 	while (!glfwWindowShouldClose(window))
@@ -97,17 +105,32 @@ int main()
 		glBindVertexArray(0);
 		
 		shader.setMat4("view",glm::value_ptr(camera.getView()));
+		
+		listModel[selectmodel].move(dir_a, dir_d, dir_s, dir_w, dir_i, dir_k);
 
+		listModel[selectmodel].setRotation(rotateX, 'x' );
+		listModel[selectmodel].setRotation(rotateY, 'y' );
+		listModel[selectmodel].setRotation(rotateZ, 'z' );
+		
+		listModel[selectmodel].move(dir_a, dir_d, dir_s, dir_w, dir_i, dir_k);
+
+		dir_a=dir_d=dir_s=dir_w=dir_i=dir_k = 0;
+		rotateZ=rotateX=rotateY = 0;
+		escala = 1;
 		
 		
 		for (int c = 0; c < 2; c++){
 			listModel[c].draw();			
-		}		
+		}
+
+		listModel[2].drawCurve(i);		
 		
 		glfwSwapBuffers(window);
 
 		i++;
 	}
+
+	
 	
 	glfwTerminate();
 	return 0;
@@ -120,6 +143,13 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 {
 	if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
 		glfwSetWindowShouldClose(window, GL_TRUE);
+
+	if (key == GLFW_KEY_M && action == GLFW_PRESS )
+	{
+		
+		selectmodel += 1;
+		selectmodel = selectmodel % 2;		
+	}
 
 	if (key == GLFW_KEY_X && (action == GLFW_PRESS || GLFW_REPEAT))
 	{
@@ -177,6 +207,26 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 	if (key == GLFW_KEY_RIGHT_BRACKET && (action == GLFW_PRESS || GLFW_REPEAT))
 	{
 		escala -= 0.02f;		
+	}
+		
+	if (key == GLFW_KEY_LEFT && (action == GLFW_PRESS))
+	{
+		dir_a += 0.1;
+	}
+
+	if (key == GLFW_KEY_RIGHT && (action == GLFW_PRESS ))
+	{
+		dir_d -= 0.1;
+	}
+	
+	if (key == GLFW_KEY_UP && (action == GLFW_PRESS ))
+	{
+		dir_w += 0.1;
+	}
+	
+	if (key == GLFW_KEY_DOWN && (action == GLFW_PRESS ))
+	{
+		dir_s -= 0.1;
 	}	
 }
 

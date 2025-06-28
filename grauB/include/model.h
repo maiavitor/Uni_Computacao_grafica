@@ -21,7 +21,7 @@ private:
 	Bezier *curve;
     	
 public:	
-	glm::vec3 lightPos = glm::vec3(1.0f, 0.8f, 0.7f);
+	glm::vec3 lightPos = glm::vec3(10.0f, 5.0f, 7.0f);
 	int points, steps;
 	float radius;	
 
@@ -32,7 +32,6 @@ public:
 		int w,h;
 		
 		loadMTL(mtl, texturePath, ka, kd, ks, specular);
-		std::cout << texturePath << std::endl;
 		textID = loadTexture("../assets/Modelos3D/"+texturePath, w, h);
 			
 		setRotation(180.0f, 'y');
@@ -51,15 +50,14 @@ public:
 			int w,h;
 			
 			loadMTL(mtl, texturePath, ka, kd, ks, specular);
-			std::cout << texturePath << std::endl;
 			textID = loadTexture("../assets/Modelos3D/"+texturePath, w, h);
 				
-			setRotation(180.0f, 'y');
-			setScale(0.5f);
+			setRotation(0.0f, 'y');
+			//setScale(0.5f);
 	
 		}
 	
-	void setTransf(glm::mat4 m){
+	void setTransf(glm::mat4 m){ 
 		model = m;
 	}
 
@@ -76,11 +74,10 @@ public:
 		glBindTexture(GL_TEXTURE_2D, textID);
 		
 		glBindVertexArray(VAO);
-
 		shader.setVec3("ka", ka.x, ka.y, ka.z);
 		shader.setVec3("kd", kd.x, kd.y, kd.z);
 		shader.setVec3("ks", ks.x, ks.y, ks.z);
-		shader.setFloat("q", specular);
+		shader.setFloat("q", specular / 2.0f );
 		shader.setVec3("lightPos", lightPos.x, lightPos.y, lightPos.z);
 		shader.setVec3("lightColor", lightColor.x, lightColor.y, lightColor.z);
 
@@ -106,7 +103,7 @@ public:
 		shader.setVec3("ka", ka.x, ka.y, ka.z);
 		shader.setVec3("kd", kd.x, kd.y, kd.z);
 		shader.setVec3("ks", ks.x, ks.y, ks.z);
-		shader.setFloat("q", specular);
+		shader.setFloat("q", specular * 10);
 		shader.setVec3("lightPos", lightPos.x, lightPos.y, lightPos.z);
 		shader.setVec3("lightColor", lightColor.x, lightColor.y, lightColor.z);
 
@@ -141,6 +138,9 @@ public:
 	        return model;
 	    }
 
+    void moveVec(glm::vec3 posi){
+    	model = glm::translate(model, posi);
+    }
         
 };
 

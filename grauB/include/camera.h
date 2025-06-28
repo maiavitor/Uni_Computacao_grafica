@@ -27,7 +27,7 @@ private:
 public:	
 
 	glm::mat4 view, projection = glm::mat4(1);
-	glm::vec3 cameraPos = glm::vec3(0.0f, 0.25f, 10.0f);
+	glm::vec3 cameraPos = glm::vec3(0.0f, 5.0f, 15.0f);
 
 	Camera(){
 

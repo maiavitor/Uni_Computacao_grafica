@@ -77,7 +77,7 @@ class Bezier {
 				float angle = (2.0f * M_PI * i) / nPoints;
 				float x = radius * cos(angle);
 				float y = radius * sin(angle);
-				controlPoints.push_back(glm::vec3(x ,y, 0.0f));
+				controlPoints.push_back(glm::vec3(x ,5.0f, y));
 			}
 		}
 };
